@@ -22,7 +22,7 @@ async function dbconnect(){
     }
     catch(error){
         console.log(error.name, error.message, error.stack);
-        res.sed({
+        res.send({
             success:false,
             error:error.message
         })
@@ -31,8 +31,50 @@ async function dbconnect(){
 dbconnect()
 
 // END POIND
-const servicesCollection = client.db('photographydb').collection('services');
+const servicesCollection = client.db('photographydb').collection('services2');
 
+// ALL SERVICES PAGE SERVICE GET
+app.get('/services',async(req,res)=>{
+    try{
+        const query = {};
+        const cursor = servicesCollection.find(query);
+        const services = await cursor.toArray();
+        res.send({
+            success:true,
+            message:"successfull data",
+            data: services
+        })
+
+    }
+    catch(error){
+        console.log(error.name, error.message, error.stack);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
+// HOME PAGE LIMIT SERVICE GET
+app.get('/service',async(req,res)=>{
+    try{
+        const query = {};
+        const cursor = servicesCollection.find(query);
+        const service = await cursor.limit(3).toArray();
+        res.send({
+            success:true,
+            message:"successfull data",
+            data: service
+        })
+
+    }
+    catch(error){
+        console.log(error.name, error.message, error.stack);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
 app.get('/', (req, res) => {
   res.send('Photography server is running!')
 })
