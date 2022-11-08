@@ -2,12 +2,36 @@ const express = require('express')
 const app = express()
 const cors= require('cors')
 const port = process.env.PORT || 5000;
+const { MongoClient, ServerApiVersion } = require('mongodb');
 // const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 // middelware
 app.use(cors())
 app.use(express.json())
+
+// DB CONNECTION
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.apqupzl.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+async function dbconnect(){
+    try{
+        await client.connect();
+        console.log("database is connected");
+        
+    }
+    catch(error){
+        console.log(error.name, error.message, error.stack);
+        res.sed({
+            success:false,
+            error:error.message
+        })
+    }
+}
+dbconnect()
+
+// END POIND
+const servicesCollection = client.db('photographydb').collection('services');
 
 app.get('/', (req, res) => {
   res.send('Photography server is running!')
