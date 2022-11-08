@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors= require('cors')
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 // const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
@@ -75,6 +75,21 @@ app.get('/service',async(req,res)=>{
         })
     }
 });
+// SINGLE SERVICES
+app.get('/services/:id', async(req,res)=>{
+    try{
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)};
+        const service = await servicesCollection.findOne(query);
+        res.send(service)
+    }
+    catch(error){
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+})
 app.get('/', (req, res) => {
   res.send('Photography server is running!')
 })
