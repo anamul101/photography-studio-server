@@ -92,6 +92,31 @@ app.get('/services/:id', async(req,res)=>{
         })
     }
 });
+// ADD SERVICE
+app.post('/services',async(req,res)=>{
+    try{
+        const addsrc = req.body;
+        const results = await reviewsCollection.insertOne(addsrc);
+        if(results.insertedId){
+            res.send({
+                success:true,
+                message:'Succesfull added your service'
+            })
+        }else{
+            res.send({
+                success:false,
+                error:'something went wrong add service'
+            })
+        }
+    }
+    catch(error){
+        console.log(error.name, error.message);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
 // REVIEWS GET
 app.get('/reviews',async(req,res)=>{
     try{
@@ -182,6 +207,11 @@ app.delete('/reviews/:id', async(req,res)=>{
                 success:true,
                 message:'Your review deleted successfull'
             })
+        }else{
+            res.send({
+                success:false,
+                error:'something went wrong review'
+            })
         }
     }
     catch(error){
@@ -192,7 +222,49 @@ app.delete('/reviews/:id', async(req,res)=>{
         })
     }
 })
-
+// update reviews
+app.get('/reviews/:id',async(req,res)=>{
+    const {id}=req.params;
+    try{
+        const results = await reviewsCollection.findOne({_id:ObjectId(id)});
+        res.send({
+            success:true,
+            data:results
+        })
+    }
+    catch(error){
+        console.log(error.name, error.message);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+})
+// patch
+app.put('/reviews/:id',async(req,res)=>{
+    const {id}=req.params;
+    try{
+        const results = await reviewsCollection.updateOne({_id:ObjectId(id)},{$set: req.body});
+        if(results.matchedCount){
+            res.send({
+                success:true,
+                message:'Review Updated succesful'
+            })
+        }else{
+            res.send({
+                success:false,
+                error:'something went wrong review update'
+            })
+        }
+    }
+    catch(error){
+        console.log(error.name, error.message);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+})
 app.get('/', (req, res) => {
   res.send('Photography server is running!')
 })
