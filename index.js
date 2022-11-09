@@ -96,7 +96,8 @@ app.get('/services/:id', async(req,res)=>{
 app.post('/services',async(req,res)=>{
     try{
         const addsrc = req.body;
-        const results = await reviewsCollection.insertOne(addsrc);
+        const results = await servicesCollection.insertOne(addsrc);
+        console.log(results);
         if(results.insertedId){
             res.send({
                 success:true,
