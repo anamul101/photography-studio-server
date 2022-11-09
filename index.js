@@ -122,11 +122,11 @@ app.get('/reviews',async(req,res)=>{
 // REVIEWS SHOW DETAILS PAGE
 app.get('/reviews',async(req,res)=>{
     try{
-        console.log(req.query.name)
+        console.log(req.query.serviceName)
         let query = {};
         if(req.query.serviceName){
             query={
-                name:req.query.serviceName
+                serviceName:req.query.serviceName
             }
         }
         const cursor = reviewsCollection.find(query);
@@ -160,6 +160,27 @@ app.post('/reviews',async(req,res)=>{
             res.send({
                 success:false,
                 error:'something went wrong review'
+            })
+        }
+    }
+    catch(error){
+        console.log(error.name, error.message);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
+// review delete
+app.delete('/reviews/:id', async(req,res)=>{
+    const {id}= req.params;
+    try{
+        
+        const results = await reviewsCollection.deleteOne({_id:ObjectId(id)});
+        if(results.deletedCount){
+            res.send({
+                success:true,
+                message:'Your review deleted successfull'
             })
         }
     }
