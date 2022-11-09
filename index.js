@@ -32,6 +32,7 @@ dbconnect()
 
 // END POIND
 const servicesCollection = client.db('photographydb').collection('services2');
+const reviewsCollection = client.db('photographydb').collection('reviews');
 
 // ALL SERVICES PAGE SERVICE GET
 app.get('/services',async(req,res)=>{
@@ -84,12 +85,93 @@ app.get('/services/:id', async(req,res)=>{
         res.send(service)
     }
     catch(error){
+        console.log(error.name, error.message);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
+// REVIEWS GET
+app.get('/reviews',async(req,res)=>{
+    try{
+        
+        let query = {};
+        if(req.query.email){
+            query={
+                email:req.query.email
+            }
+        }
+        const cursor = reviewsCollection.find(query);
+        const reviews = await cursor.toArray();
+        res.send({
+            success:true,
+            message:"successfull data",
+            data: reviews
+        })
+
+    }
+    catch(error){
+        console.log(error.name, error.message, error.stack);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
+// REVIEWS SHOW DETAILS PAGE
+app.get('/reviews',async(req,res)=>{
+    try{
+        console.log(req.query.name)
+        let query = {};
+        if(req.query.serviceName){
+            query={
+                name:req.query.serviceName
+            }
+        }
+        const cursor = reviewsCollection.find(query);
+        const reviews = await cursor.toArray();
+        res.send({
+            success:true,
+            message:"successfull data",
+            data: reviews
+        })
+
+    }
+    catch(error){
+        console.log(error.name, error.message, error.stack);
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+});
+// REVIEWS INSERT
+app.post('/reviews',async(req,res)=>{
+    try{
+        const review = req.body;
+        const results = await reviewsCollection.insertOne(review);
+        if(results.insertedId){
+            res.send({
+                success:true,
+                message:`seccussful review ${req.body.serviceName}`
+            })
+        }else{
+            res.send({
+                success:false,
+                error:'something went wrong review'
+            })
+        }
+    }
+    catch(error){
+        console.log(error.name, error.message);
         res.send({
             success:false,
             error:error.message
         })
     }
 })
+
 app.get('/', (req, res) => {
   res.send('Photography server is running!')
 })
