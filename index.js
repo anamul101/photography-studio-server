@@ -3,12 +3,28 @@ const app = express()
 const cors= require('cors')
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 // middelware
 app.use(cors())
 app.use(express.json())
+
+// jwt
+function verifyjwt(req,res,next){
+    const authorizeJwt = req.headers.authorization;
+    if(!authorizeJwt){
+       return res.status(401).send({message: 'Unauthorize access'});
+    }
+    const token = authorizeJwt.split(' ')[1];
+    jwt.verify(token, process.env.USER_TOKEN, function(err,decoded){
+        if(err){
+           return res.status(403).send({message: 'Unauthorize access'});
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
 
 // DB CONNECTION
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.apqupzl.mongodb.net/?retryWrites=true&w=majority`;
@@ -33,6 +49,20 @@ dbconnect()
 // END POIND
 const servicesCollection = client.db('photographydb').collection('services2');
 const reviewsCollection = client.db('photographydb').collection('reviews');
+
+app.post('/jwt', (req,res)=>{
+    try{
+        const user = req.body;
+        const token = jwt.sign(user, process.env.USER_TOKEN, {expiresIn: '1d'});
+        res.send({token});
+    }
+    catch(error){
+        res.send({
+            success:false,
+            error:error.message
+        })
+    }
+})
 
 // ALL SERVICES PAGE SERVICE GET
 app.get('/services',async(req,res)=>{
@@ -119,8 +149,12 @@ app.post('/services',async(req,res)=>{
     }
 });
 // REVIEWS GET
-app.get('/reviews',async(req,res)=>{
+app.get('/reviews',verifyjwt,async(req,res)=>{
     try{
+        const decoded = req.decoded;
+        if(decoded.email !== req.query.email){
+            res.status(401).send({message: 'Unauthorize access'})
+        }
         
         let query = {};
         if(req.query.email){
