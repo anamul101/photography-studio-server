@@ -155,38 +155,11 @@ app.get('/reviews',verifyjwt,async(req,res)=>{
         if(decoded.email !== req.query.email){
             res.status(401).send({message: 'Unauthorize access'})
         }
-        
+
         let query = {};
         if(req.query.email){
             query={
                 email:req.query.email
-            }
-        }
-        const cursor = reviewsCollection.find(query);
-        const reviews = await cursor.toArray();
-        res.send({
-            success:true,
-            message:"successfull data",
-            data: reviews
-        })
-
-    }
-    catch(error){
-        console.log(error.name, error.message, error.stack);
-        res.send({
-            success:false,
-            error:error.message
-        })
-    }
-});
-// REVIEWS SHOW DETAILS PAGE
-app.get('/reviews',async(req,res)=>{
-    try{
-        console.log(req.query.serviceName)
-        let query = {};
-        if(req.query.serviceName){
-            query={
-                serviceName:req.query.serviceName
             }
         }
         const cursor = reviewsCollection.find(query);
