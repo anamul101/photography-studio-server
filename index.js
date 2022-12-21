@@ -46,7 +46,7 @@ async function dbconnect(){
 }
 dbconnect()
 
-// END POIND
+// End Point
 const servicesCollection = client.db('photographydb').collection('services2');
 const reviewsCollection = client.db('photographydb').collection('reviews');
 
@@ -278,5 +278,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Assignment 11 photography server site ${port}`)
+  console.log(`photography server site ${port}`)
 })
